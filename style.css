@@ -51,8 +51,6 @@ header h1 {
   width: 25rem;
 }
 
-.function-card {
-}
 .function-card--top {
   border-bottom: solid 3px #f5f5f5;
   padding: 1.8rem 2rem 1rem 2rem;
@@ -67,8 +65,7 @@ header h1 {
 .function-card--top h2 span.text-active {
   color: var(--mode-color);
 }
-.function-card--top h2 span.decrypt-text {
-}
+
 .function-card--top h2 span.vertical-line {
   color: var(--mode-color);
 }
@@ -236,8 +233,6 @@ header h1 {
   .container {
     width: 100%;
     padding-block: 2rem;
-  }
-  .row-2 {
   }
 }
 @media (max-width: 833px) {
