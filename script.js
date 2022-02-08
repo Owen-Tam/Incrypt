@@ -58,10 +58,10 @@ class App {
     originalInput.value = codedOutput.textContent = "";
   }
   _editShiftValue(e) {
-    if (!e.data) return;
+    if (!shiftInput.value) return;
     const alpha = alphabetInput.value;
     const firstLetter = alpha.slice(0, 1);
-    const toLetter = alpha[e.data - 1];
+    const toLetter = alpha[shiftInput.value - 1];
     shiftDisplayFirstLetter.textContent = firstLetter;
     shiftDisplayToLetter.textContent = toLetter;
     console.log("Hi");
