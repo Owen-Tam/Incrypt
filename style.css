@@ -9,6 +9,11 @@
   --off-color: #9a9a9a;
   --hover-color: #bbbbbb;
 }
+button,
+input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
 body {
   display: flex;
 }
