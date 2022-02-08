@@ -241,6 +241,7 @@ header h1 {
   .container {
     width: 100%;
     padding-block: 2rem;
+    min-height: calc(100vh - 2rem);
   }
 }
 @media (max-width: 833px) {
