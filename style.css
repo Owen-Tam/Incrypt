@@ -7,6 +7,7 @@
 :root {
   --mode-color: #00b29d;
   --off-color: #9a9a9a;
+  --hover-color: #bbbbbb;
 }
 body {
   display: flex;
@@ -161,7 +162,9 @@ header h1 {
 }
 .submit-button {
   margin-top: 1rem;
+  transition: background 200ms;
 }
+
 .original-card--top,
 .coded-card--top {
   padding: 1.8rem 2rem 1rem 2rem;
@@ -207,7 +210,7 @@ header h1 {
   transition: background 200ms;
 }
 .copy-button i:hover {
-  background: var(--off-color);
+  background: var(--hover-color);
 }
 .coded-card {
   position: relative;
@@ -266,9 +269,30 @@ header h1 {
 .primary-btn {
   border: none;
   background: #d4d4d4;
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 1.2rem;
   border-radius: 5px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
+  transition: background 200ms;
+}
+.primary-btn:hover {
+  background-color: var(--hover-color);
+}
+.secondary-btn {
+  border: none;
+  background: none;
+  border: solid 3px #d4d4d4;
+  padding: 0.8rem 1.2rem;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 200ms;
+}
+.secondary-btn:hover {
+  background: #d4d4d450;
+}
+.copyright a {
+  color: inherit;
 }
