@@ -9,6 +9,9 @@
   --off-color: #9a9a9a;
   --hover-color: #bbbbbb;
 }
+::selection {
+  background: var(--mode-color);
+}
 button,
 input {
   -webkit-appearance: none;
