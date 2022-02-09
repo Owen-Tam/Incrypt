@@ -16,9 +16,11 @@ const changeCont = document.querySelector(".function-card--top");
 const codedTitle = document.querySelector(".coded-title");
 const originalCopyBtn = document.querySelector(".original-copy");
 const codedCopyBtn = document.querySelector(".coded-copy");
+const keyInput = document.querySelector(".key-input");
 class App {
   caesar = ["shift", "alphabet"];
   reverse = [];
+  vigenere = ["key"];
   _type = "caesar";
   _mode = "encrypt";
   constructor() {
@@ -31,9 +33,11 @@ class App {
     changeCont.addEventListener("click", this._changeMode.bind(this));
     originalCopyBtn.addEventListener("click", this._copyOg.bind(this));
     codedCopyBtn.addEventListener("click", this._copyCoded.bind(this));
+    keyInput.addEventListener("input", this._editKey.bind(this));
   }
   _innit() {
     alphabetInput.value = "abcdefghijklmnopqrstuvwxyz";
+    this._changeTo(this._type);
   }
   changeClick(e) {
     if (e.target.closest(".custom-select--text")) {
@@ -59,16 +63,52 @@ class App {
   }
   _editShiftValue(e) {
     if (!shiftInput.value) return;
+    const shiftArr = shiftInput.value.split("").map(val => {
+      if (Number.isFinite(+val)) {
+        return +val;
+      }
+      return val;
+    });
+    shiftArr.forEach(valu => {
+      if (!Number.isFinite(valu)) {
+        alert("Only Numbers are allowed as a shift!");
+        shiftInput.value = shiftArr
+          .filter(val => Number.isFinite(val))
+          .join("");
+      }
+    });
+    this._calcAlpha();
+  }
+  _calcAlpha() {
     const alpha = alphabetInput.value;
     const firstLetter = alpha.slice(0, 1);
     const toLetter = alpha[shiftInput.value - 1];
     shiftDisplayFirstLetter.textContent = firstLetter;
     shiftDisplayToLetter.textContent = toLetter;
-    console.log("Hi");
   }
-  _changeAlpha() {
+  _changeAlpha(e) {
     const alpha = alphabetInput.value;
-    console.log(alpha);
+    const validInput = function (letter) {
+      return (
+        alpha
+          .replace(letter, "")
+          // restore the alpha before adding letter
+          .split("")
+          .every(alph => alph !== letter)
+      ); // check if it exists in the previous alpha; if no then true; if yes then false
+    };
+    if (!e.data) return;
+    if (!validInput(e.data)) {
+      // if hv duplicated letters
+      alert("No duplicated letters are allowed in the alphabet");
+      // remove the duplicated letter
+      alphabetInput.value = [...new Set(alpha.split(""))].join("");
+      // alpha.split make into array of letters in alpha
+      // new Set makes the arr have no duplicates
+      // [...] destructures the set to become an array of the letters (no dupes now)
+      // .join joins the array back to a string (with no dupes)
+      return;
+    }
     if (!document.querySelector(".shift-module").classList.contains("hidden")) {
       const firstLetter = alpha.slice(0, 1);
       const toLetter = alpha[shiftInput.value - 1];
@@ -81,9 +121,7 @@ class App {
     const alpha = alphabetInput.value;
     const alphaUpper = alpha.toUpperCase();
 
-    const shifted =
-      alpha.replace(`${alpha.slice(0, shift - 1)}`, "") +
-      alpha.slice(0, shift - 1);
+    const shifted = this._genShiftedAlphaCaesar(alpha, shift);
     const shiftedUpper = shifted.toUpperCase();
 
     const encryptedStr = str
@@ -100,6 +138,17 @@ class App {
       })
       .join("");
     return encryptedStr;
+  }
+  _genShiftedAlphaCaesar(alpha, shift) {
+    const shifted =
+      alpha.replace(`${alpha.slice(0, shift - 1)}`, "") +
+      alpha.slice(0, shift - 1);
+    return shifted;
+  }
+  _genShiftedAlphaVigenere(alpha, shift) {
+    const shifted =
+      alpha.replace(`${alpha.slice(0, shift)}`, "") + alpha.slice(0, shift);
+    return shifted;
   }
   _decryptcaesar(str, shift) {
     const alpha = alphabetInput.value;
@@ -131,8 +180,104 @@ class App {
   _decryptreverse(str) {
     return str.split("").reverse().join("");
   }
+  _findKey(str) {
+    const alpha = alphabetInput.value;
+    const alphaUpper = alpha.toUpperCase();
+    const alphaUpperArr = alphaUpper.split("");
+    const alphaArr = alpha.split("");
+    const key = str.split("").map(val => {
+      if (alphaArr.includes(val)) {
+        return alphaArr.findIndex(alph => alph === val);
+      }
+      if (alphaUpperArr.includes(val)) {
+        return alphaUpperArr.findIndex(alph => alph === val);
+      }
+      return val;
+    });
+    return key;
+  }
+  _encryptVigenere(str, key) {
+    if (!key) return;
+    if (!keyInput.value) return alert("Please enter in a key.");
+    const alpha = "abcdefghijklmnopqrstuvwxyz";
+
+    const copiedKey = str.split("").map((_, i) => key[i % key.length]);
+    /*repeat key (an array of numbers) each number one by one on every 
+    character in str and ultimately get key the same length as str*/
+
+    alphabetInput.value = "abcdefghijklmnopqrstuvwxyz";
+
+    const rows = copiedKey.map(num => {
+      return this._genShiftedAlphaVigenere(alpha, num);
+    });
+
+    const encryptedStr = rows
+      .map((row, i) => {
+        if (alpha.toUpperCase().includes(str[i]))
+          return row.toUpperCase()[
+            alpha
+              .toUpperCase()
+              .split("")
+              .findIndex(letter => letter === str[i])
+          ];
+        if (!alpha.includes(str[i]) || Number.isFinite(+str[i])) return str[i];
+
+        return row[alpha.split("").findIndex(letter => letter === str[i])];
+      })
+      .join("");
+    return encryptedStr;
+  }
+  _decryptVigenere(str, key) {
+    if (!key) return;
+    const alpha = "abcdefghijklmnopqrstuvwxyz";
+
+    const copiedKey = str.split("").map((_, i) => key[i % key.length]);
+    /*repeat key (an array of numbers) each number one by one on every 
+    character in str and ultimately get key the same length as str*/
+
+    const rows = copiedKey.map(num => {
+      return this._genShiftedAlphaVigenere(alpha, num);
+    });
+    const decryptedStr = rows
+      .map((row, i) => {
+        if (alpha.toUpperCase().includes(str[i]))
+          return alpha.toUpperCase()[
+            row
+              .toUpperCase()
+              .split("")
+              .findIndex(letter => letter === str[i])
+          ];
+        if (!alpha.includes(str[i]) || Number.isFinite(+str[i])) return str[i];
+
+        return alpha[row.split("").findIndex(letter => letter === str[i])];
+      })
+      .join("");
+    return decryptedStr;
+  }
+  _editKey(e) {
+    const alpha = "abcdefghijklmnopqrstuvwxyz";
+    const validInput = function (char) {
+      return alpha.includes(char);
+    };
+    if (!e.data) return;
+    if (!validInput(e.data)) {
+      keyInput.value = keyInput.value
+        .split("")
+        .filter(char => validInput(char))
+        .join("");
+      alert("Key can only be lowercase English Characters");
+    }
+  }
   _submit() {
     let encryptedMsg;
+
+    if (+shiftInput.value < 1 || +shiftInput.value > 26) {
+      alert("Shift value must be including within 1 and 26");
+      shiftInput.value = 4;
+      shiftInput.focus();
+      this._calcAlpha();
+      return;
+    }
     if (!originalInput.value) return;
     if (this._type === "caesar") {
       if (this._mode === "encrypt") {
@@ -155,6 +300,21 @@ class App {
       }
       if (this._mode === "decrypt") {
         encryptedMsg = this._decryptreverse(originalInput.value);
+      }
+    }
+
+    if (this._type === "vigenere") {
+      if (this._mode === "encrypt") {
+        encryptedMsg = this._encryptVigenere(
+          originalInput.value,
+          this._findKey(keyInput.value)
+        );
+      }
+      if (this._mode === "decrypt") {
+        encryptedMsg = this._decryptVigenere(
+          originalInput.value,
+          this._findKey(keyInput.value)
+        );
       }
     }
 

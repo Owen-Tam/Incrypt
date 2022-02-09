@@ -154,7 +154,7 @@ header h1 {
 .shift-arrow {
   font-size: 1rem;
 }
-.alphabet-module input {
+.function-card--bottom input.text-input {
   border: none;
   border-bottom: solid 1px #d4d4d4;
   width: 100%;
@@ -162,7 +162,7 @@ header h1 {
   font-family: Roboto Mono, monospace;
   color: #9a9a9a;
 }
-.alphabet-module input:focus {
+.function-card--bottom input.text-input:focus {
   outline: none;
 }
 .submit-button {
